@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tailscale 操作マニュアル — 営業員向け日常操作ガイド</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Share+Tech+Mono&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #0D2137;
+    --blue:    #1A5276;
+    --accent:  #2E86C1;
+    --light:   #AED6F1;
+    --teal:    #148F77;
+    --teal-l:  #D5F5E3;
+    --amber:   #B7770D;
+    --amber-l: #FEF9E7;
+    --red:     #922B21;
+    --red-l:   #FDEDEC;
+    --gray:    #F2F3F4;
+    --border:  #D5D8DC;
+    --text:    #1C2833;
+    --muted:   #717D7E;
+    --white:   #FFFFFF;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #EAF0F6;
+    color: var(--text);
+    padding: 32px 16px 80px;
+    line-height: 1.7;
+  }
+
+  .page { max-width: 820px; margin: 0 auto; }
+
+  /* ── Cover ── */
+  .cover {
+    background: var(--navy);
+    border-radius: 14px;
+    padding: 40px 44px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::after {
+    content: 'TAILSCALE';
+    position: absolute;
+    right: -20px; bottom: -30px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 80px;
+    color: rgba(255,255,255,0.04);
+    letter-spacing: 4px;
+    user-select: none;
+  }
+  .cover-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--light);
+    background: rgba(174,214,241,0.12);
+    border: 1px solid rgba(174,214,241,0.25);
+    border-radius: 4px;
+    padding: 4px 10px; margin-bottom: 14px;
+  }
+  .cover h1 {
+    font-size: 24px; font-weight: 700;
+    color: var(--white); line-height: 1.4;
+    margin-bottom: 10px;
+  }
+  .cover p { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.7; }
+
+  /* ── Notice bar ── */
+  .notice {
+    background: var(--amber-l);
+    border: 1px solid #F9E79F;
+    border-left: 4px solid var(--amber);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 28px;
+    font-size: 13px; line-height: 1.75;
+    color: var(--text);
+  }
+  .notice strong { color: var(--amber); }
+
+  /* ── Section ── */
+  .section {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .sec-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 15px 22px;
+    background: var(--navy);
+  }
+  .sec-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px; color: var(--light);
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+  }
+  .sec-title {
+    font-size: 14px; font-weight: 700; color: var(--white);
+  }
+
+  /* ── Step ── */
+  .steps { padding: 0 22px 20px; }
+  .step {
+    display: flex; gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--gray);
+    align-items: flex-start;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--white);
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-body { flex: 1; }
+  .step-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text); margin-bottom: 4px;
+  }
+  .step-desc {
+    font-size: 13px; color: var(--muted); line-height: 1.75;
+  }
+  .step-img {
+    margin-top: 10px;
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px; color: var(--accent);
+    line-height: 1.8;
+  }
+
+  /* ── Caution / Tip ── */
+  .caution {
+    background: var(--red-l);
+    border: 1px solid #F1948A;
+    border-left: 4px solid var(--red);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 12px; color: var(--red); line-height: 1.7;
+  }
+  .tip {
+    background: var(--teal-l);
+    border: 1px solid #82E0AA;
+    border-left: 4px solid var(--teal);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 12px; color: var(--teal); line-height: 1.7;
+  }
+
+  /* ── Rules table ── */
+  .rules { padding: 0 22px 20px; }
+  .rule-row {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray);
+    align-items: flex-start;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-icon { font-size: 18px; margin-top: 1px; }
+  .rule-body {}
+  .rule-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--text); margin-bottom: 3px;
+  }
+  .rule-desc { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+  /* ── Quick ref ── */
+  .qref { padding: 0 22px 20px; }
+  .qref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .qref-item {
+    background: var(--gray);
+    border-radius: 8px;
+    padding: 12px 14px;
+    border-left: 3px solid var(--accent);
+  }
+  .qref-q { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .qref-a { font-size: 12px; color: var(--muted); line-height: 1.65; }
+
+  /* ── Contact ── */
+  .contact {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .contact-item { }
+  .contact-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--light); opacity: 0.7;
+    margin-bottom: 5px;
+  }
+  .contact-val { font-size: 15px; font-weight: 700; color: var(--white); }
+  .contact-note { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+
+  /* ── footer ── */
+  .footer {
+    text-align: center;
+    font-size: 11px; color: var(--muted);
+    margin-top: 24px;
+    line-height: 1.8;
+  }
+
+
+  /* ── モバイル対応 ── */
+  @media screen and (max-width: 600px) {
+    body { padding: 12px 10px 60px; }
+
+    .cover { padding: 24px 20px; }
+    .cover h1 { font-size: 18px; }
+    .cover p { font-size: 12px; }
+
+    .sec-head { padding: 12px 14px; }
+    .sec-title { font-size: 13px; }
+
+    .steps { padding: 0 12px 16px; }
+    .step { gap: 10px; padding: 12px 0; }
+    .step-title { font-size: 13px; }
+    .step-desc { font-size: 12px; }
+    .step-img {
+      font-size: 11px !important;
+      padding: 10px 12px !important;
+      overflow-x: auto;
+      word-break: break-all;
+    }
+
+    .rules { padding: 0 12px 16px; }
+    .rule-row { gap: 8px; padding: 12px 0; }
+    .rule-title { font-size: 12px; }
+    .rule-desc { font-size: 11px; }
+
+    .qref { padding: 0 12px 16px; }
+    .qref-grid {
+      grid-template-columns: 1fr;
+    }
+    .qref-q { font-size: 12px; }
+    .qref-a { font-size: 11px; }
+
+    .notice { padding: 12px 14px; font-size: 12px; }
+
+    .caution { font-size: 11px; }
+    .tip { font-size: 11px; }
+
+    /* アイコン説明の横並びをスマホ用に調整 */
+    .step-img div[style*="display:flex"] {
+      flex-direction: column !important;
+    }
+
+    /* SVGアイコンエリア */
+    .step-img svg { flex-shrink: 0; }
+  }
+  @media print {
+    @page {
+      size: A4;
+      margin: 15mm 15mm 15mm 15mm;
+    }
+
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      background: white !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      font-size: 11px;
+    }
+
+    .page {
+      max-width: 100%;
+    }
+
+    /* セクションが途中で切れないようにする */
+    .section {
+      break-inside: avoid;
+      page-break-inside: avoid;
+      margin-bottom: 12px;
+    }
+
+    /* ステップが途中で切れないようにする */
+    .step {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* 注意事項の各行が切れないようにする */
+    .rule-row {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* よくある質問のグリッドをA4に合わせる */
+    .qref-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .qref-item {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* カバーの背景色を維持 */
+    .cover {
+      background: #0D2137 !important;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+
+    .sec-head {
+      background: #0D2137 !important;
+    }
+
+    /* 余白調整 */
+    .steps { padding: 0 16px 12px; }
+    .rules { padding: 0 16px 12px; }
+    .qref  { padding: 0 16px 12px; }
+
+    /* ページ区切りをセクション間に入れる */
+    .section + .section {
+      break-before: auto;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Cover -->
+  <div class="cover">
+    <div class="cover-tag">営業員向け操作マニュアル — Windows版</div>
+    <h1>Tailscale<br>日常操作ガイド</h1>
+    <p>接続・切断・Exit nodeの選択など、毎日の業務で使う操作をまとめています。<br>困ったときはこのマニュアルを最初に確認してください。</p>
+  </div>
+
+
+  <div class="notice">
+    <strong>【使い方の基本】証券会社のシステムを使うときだけ接続してください。</strong><br>
+    使い終わったら Exit nodes を「None」に戻す習慣をつけてください。使っていないときに切っておくことで回線の混雑を防げます。
+  </div>
+
+  <!-- Section 1: インストール確認 -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <span class="sec-title">はじめに — Tailscaleが使える状態か確認する</span>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">タスクトレイを確認する</div>
+          <div class="step-desc">画面右下の時計の近くにあるタスクトレイ（通知領域）にTailscaleのアイコンがあるか確認します。見つからない場合は「∧」をクリックして隠れているアイコンを表示してください。</div>
+          <div class="step-img" style="padding:16px 18px;">
+            <div style="font-size:12px;font-weight:700;color:#444;margin-bottom:12px;">タスクトレイアイコンの見方</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+
+              <!-- 未接続 -->
+              <div style="display:flex;align-items:center;gap:14px;background:#f8f8f8;border-radius:6px;padding:8px 12px;border:1px solid #e0e0e0;">
+                <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+                  <rect width="44" height="44" rx="10" fill="#e8e8e8"/>
+                  <!-- 3x3 grid all gray -->
+                  <circle cx="13" cy="13" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="22" cy="13" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="31" cy="13" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="13" cy="22" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="22" cy="22" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="31" cy="22" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="13" cy="31" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="22" cy="31" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="31" cy="31" r="3.5" fill="#b0b0b0"/>
+                </svg>
+                <div style="flex:1;">
+                  <div style="font-size:12px;font-weight:700;color:#888;">未接続</div>
+                  <div style="font-size:11px;color:#aaa;margin-top:2px;">全ドットがグレー</div>
+                </div>
+                <div style="font-size:11px;color:#e74c3c;font-weight:700;white-space:nowrap;">✗ 使用不可</div>
+              </div>
+
+              <!-- 接続中（Tの形：上段中央＋中段＋下段中央が黒） -->
+              <div style="display:flex;align-items:center;gap:14px;background:#eaf4fb;border-radius:6px;padding:8px 12px;border:1px solid #aed6f1;">
+                <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+                  <rect width="44" height="44" rx="10" fill="#e8e8e8"/>
+                  <!-- 上段：全部グレー -->
+                  <circle cx="13" cy="13" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="22" cy="13" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="31" cy="13" r="3.5" fill="#b0b0b0"/>
+                  <!-- 中段：全部黒 -->
+                  <circle cx="13" cy="22" r="3.5" fill="#1a1a1a"/>
+                  <circle cx="22" cy="22" r="3.5" fill="#1a1a1a"/>
+                  <circle cx="31" cy="22" r="3.5" fill="#1a1a1a"/>
+                  <!-- 下段：左右グレー、中央黒 -->
+                  <circle cx="13" cy="31" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="22" cy="31" r="3.5" fill="#1a1a1a"/>
+                  <circle cx="31" cy="31" r="3.5" fill="#b0b0b0"/>
+                </svg>
+                <div style="flex:1;">
+                  <div style="font-size:12px;font-weight:700;color:#1a5276;">接続中（Connected）</div>
+                  <div style="font-size:11px;color:#5d8aa8;margin-top:2px;">黒いドットが「T」の形に並んでいる</div>
+                </div>
+                <div style="font-size:11px;color:#2e86c1;font-weight:700;white-space:nowrap;">△ Exit node未選択</div>
+              </div>
+
+              <!-- Exit node接続中：Tの形＋下段右2つのグレー丸に重なる矢印 -->
+              <div style="display:flex;align-items:center;gap:14px;background:#eafaf1;border-radius:6px;padding:8px 12px;border:1px solid #82e0aa;">
+                <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+                  <rect width="44" height="44" rx="10" fill="#e8e8e8"/>
+                  <!-- 上段：全部グレー -->
+                  <circle cx="13" cy="13" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="22" cy="13" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="31" cy="13" r="3.5" fill="#b0b0b0"/>
+                  <!-- 中段：全部黒 -->
+                  <circle cx="13" cy="22" r="3.5" fill="#1a1a1a"/>
+                  <circle cx="22" cy="22" r="3.5" fill="#1a1a1a"/>
+                  <circle cx="31" cy="22" r="3.5" fill="#1a1a1a"/>
+                  <!-- 下段：左グレー、中央・右グレー（矢印が重なる） -->
+                  <circle cx="13" cy="31" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="22" cy="31" r="3.5" fill="#b0b0b0"/>
+                  <circle cx="31" cy="31" r="3.5" fill="#b0b0b0"/>
+                  <!-- 矢印：下段右2つのグレー丸の上に重なる形 -->
+                  <line x1="19" y1="31" x2="34" y2="31" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+                  <polyline points="28,26 35,31 28,36" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div style="flex:1;">
+                  <div style="font-size:12px;font-weight:700;color:#148f77;">Exit node 接続中</div>
+                  <div style="font-size:11px;color:#1e8449;margin-top:2px;">「T」の形＋下段に右矢印が重なって表示</div>
+                </div>
+                <div style="font-size:11px;color:#148f77;font-weight:700;white-space:nowrap;">✓ 業務可能</div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">アプリが起動していない場合</div>
+          <div class="step-desc">スタートメニューで「Tailscale」と検索してアプリを起動します。起動するとタスクトレイにアイコンが表示されます。</div>
+          <div class="tip">💡 Windowsの設定で「スタートアップ」に登録しておくと、PC起動時に自動で立ち上がります。設定方法は担当者にご確認ください。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: 接続 -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <span class="sec-title">業務開始時 — Tailscaleに接続する</span>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">タスクトレイのアイコンを右クリック</div>
+          <div class="step-desc">Tailscaleのアイコンを右クリックするとメニューが表示されます。メニュー上部に「Connected」と表示されていれば接続済みです。STEP 3へ進んでください。</div>
+          <div class="step-img">
+            メニュー上部の表示で状態を確認<br>
+            「Tailscale  Connected」　→ 接続済み（STEP 3へ）<br>
+            「Tailscale  Not connected」→ 未接続（STEP 2へ）<br>
+            ログイン画面が表示される　→ ログインが必要（STEP 2-Bへ）
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">未接続の場合 — 「Log in」でログインする</div>
+          <div class="step-desc">「Log in」をクリックするとブラウザが開きます。<strong>会社のMicrosoftアカウント</strong>でサインインしてください。ログイン完了後、メニューに「Connected」と表示されたら接続完了です。</div>
+          <div class="caution">⚠ 個人のMicrosoftアカウントやGoogleアカウントではログインできません。必ず会社から案内されたアカウントを使用してください。</div>
+          <div class="tip">💡 一度ログインすれば次回からは自動的に接続されます。毎回ログインする必要はありません。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">「Exit nodes」→ 所属支店名を選択する</div>
+          <div class="step-desc">右クリックメニューから「Exit nodes」を選択すると選択肢が表示されます。「Recommended: 〇〇-hub」という表示が出ることがありますが、<strong>必ず自分の所属支店名（〇〇-hub）を選択してください。</strong>選択した支店名の左にチェックマーク（✓）が付けば設定完了です。</div>
+          <div class="step-img">
+            Exit nodes の選び方（例）<br>
+            ✓ 本店勤務の方　→「honten-hub」を選択<br>
+            ✓ 大阪勤務の方　→「osaka-hub」を選択<br>
+            ✓ 渋谷勤務の方　→「shibuya-hub」を選択<br>
+            ✓ 神戸勤務の方　→「kobe-hub」を選択<br>
+            <br>
+            ※「Recommended」はシステムが自動で候補を出すものですが、<br>
+            　かならず自分の所属支店名をご自身で選んでください。
+          </div>
+          <div class="caution">⚠ 「Exit nodes」を選択しないと証券会社のシステムに接続できません。必ず所属支店を選択してから業務を開始してください。別の支店を選ぶと接続できない場合があります。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">接続確認 — 業務システムにアクセスしてみる</div>
+          <div class="step-desc">ブラウザで普段使っている証券会社のシステムにアクセスします。正常に表示されれば準備完了です。</div>
+          <div class="tip">💡 接続に5〜10秒かかることがあります。すぐにつながらなくても少し待ってから再試行してください。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: 切断 -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <span class="sec-title">証券会社システムの使用が終わったら — Exit nodesをNoneに戻す</span>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">タスクトレイのアイコンを右クリック</div>
+          <div class="step-desc">Tailscaleのアイコンを右クリックしてメニューを開きます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">「Exit nodes」→「None」を選択する</div>
+          <div class="step-desc">証券会社のシステムを使い終わったら、すぐにExit nodesを「None」に戻してください。「Exit nodes」をクリックし、一覧の中から「None」を選択します。支店名のチェックが外れれば完了です。こまめに切る習慣をつけることで支店の回線混雑を防げます。</div>
+          <div class="tip">💡 PCをシャットダウンする場合はそのままシャットダウンしても問題ありません。次回起動時にExit nodesで支店を選び直してください。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: 注意事項 -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <span class="sec-title">使用上の注意事項</span>
+    </div>
+    <div class="rules">
+      <div class="rule-row">
+        <div class="rule-icon">🔴</div>
+        <div class="rule-body">
+          <div class="rule-title">証券会社のシステムを使うときだけ接続してください</div>
+          <div class="rule-desc">使い終わったら Exit nodes を「None」に戻してください。常時接続したままにすると支店の回線が混雑する原因になります。こまめに切る習慣をつけてください。</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon">🔴</div>
+        <div class="rule-body">
+          <div class="rule-title">Exit nodeは必ず自分の所属支店を選択してください</div>
+          <div class="rule-desc">所属支店に接続する方が距離が近い分、速度が安定します。接続支店を変更したい場合はSlackで @事務員 にメンションしてご連絡ください。柔軟に対応します。</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon">🟡</div>
+        <div class="rule-body">
+          <div class="rule-title">PC紛失・盗難の際は即座にSlackで @事務員 にご連絡ください</div>
+          <div class="rule-desc">管理者アカウントからアカウント削除を行いますので、Tailscaleの接続ができなくなり証券会社へのアクセスもできなくなります。報告が遅れると第三者にアクセスされる恐れがありますので、すぐにご連絡ください。</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon">🟡</div>
+        <div class="rule-body">
+          <div class="rule-title">業務用PCは個人専用でご使用ください</div>
+          <div class="rule-desc">Tailscaleは業務専用のアプリです。セキュリティ上、ご家族や知人との共用PCへのインストールはご遠慮ください。業務用として個人専用のPCにインストールしてください。</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon">🟢</div>
+        <div class="rule-body">
+          <div class="rule-title">外出先でのご利用には注意してください</div>
+          <div class="rule-desc">画面を第三者に見られないよう背後への注意やプライバシーフィルターの使用など、基本的な対策は各自でお願いします。</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon">🟢</div>
+        <div class="rule-body">
+          <div class="rule-title">Windowsのセキュリティ（ウイルス対策）は常に有効にしてください</div>
+          <div class="rule-desc">Windowsセキュリティが無効になっているとウイルス感染のリスクが高まります。定期的にWindowsUpdateも実行してOSを最新の状態に保ってください。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5: よくある質問 -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <span class="sec-title">よくある質問</span>
+    </div>
+    <div class="qref">
+      <div class="qref-grid">
+        <div class="qref-item">
+          <div class="qref-q">Q. つながらない・遅い</div>
+          <div class="qref-a">①アイコンを右クリックして「Connected」と表示されているか確認 ②Exit nodesで所属支店が選択されているか確認 ③一度「None」に戻してから支店を選び直す</div>
+        </div>
+        <div class="qref-item">
+          <div class="qref-q">Q. 「Connected」が表示されない</div>
+          <div class="qref-a">右クリックして「Log in」が表示されている場合は会社のMicrosoftアカウントでログインしなおしてください。</div>
+        </div>
+        <div class="qref-item">
+          <div class="qref-q">Q. Exit Nodeの選択肢に支店名が出ない</div>
+          <div class="qref-a">支店のハブPCが起動していない可能性があります。Slackで @事務員 にメンションしてご連絡ください。他支店のハブへの接続をご案内いたします。</div>
+        </div>
+        <div class="qref-item">
+          <div class="qref-q">Q. PCを再起動したら切れた</div>
+          <div class="qref-a">再起動後はExit nodesが「None」に戻ります。証券会社のシステムを使う前に「Exit nodes」→所属支店を選択しなおしてください。</div>
+        </div>
+        <div class="qref-item">
+          <div class="qref-q">Q. Tailscaleとは関係ない気がするがPCが重い</div>
+          <div class="qref-a">TailscaleはPCへの負荷がほとんどありません。PC本体の問題の可能性が高いため個別にご対応ください。</div>
+        </div>
+        <div class="qref-item">
+          <div class="qref-q">Q. PCを買い替えたい・新しいPCに入れたい</div>
+          <div class="qref-a">Slackで @事務員 にメンションしてご連絡ください。PC選びから設定まで対応します。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+</div>
+</body>
+</html>
