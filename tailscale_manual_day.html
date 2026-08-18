@@ -168,6 +168,40 @@
     font-size: 12px; color: var(--teal); line-height: 1.7;
   }
 
+  /* ── 折りたたみ（まれなケース用） ── */
+  .foldout {
+    margin-top: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fbfbfb;
+  }
+  .foldout > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 9px 14px;
+    font-size: 12px; font-weight: 700;
+    color: var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .foldout > summary::-webkit-details-marker { display: none; }
+  .foldout > summary::before {
+    content: "▶";
+    font-size: 9px;
+    transition: transform .15s;
+  }
+  .foldout[open] > summary::before { transform: rotate(90deg); }
+  .foldout[open] > summary { border-bottom: 1px solid var(--border); }
+  .foldout-body { padding: 12px 14px 14px; }
+  .foldout-body .step-desc { font-size: 12px; }
+  .foldout-body > .step-img:first-child,
+  .foldout-body > .caution:first-child,
+  .foldout-body > .tip:first-child { margin-top: 0; }
+  .foldout-sub {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    margin: 14px 0 4px;
+  }
+  .foldout-body > .foldout-sub:first-child { margin-top: 0; }
+
   /* ── Rules table ── */
   .rules { padding: 0 22px 20px; }
   .rule-row {
@@ -301,6 +335,10 @@
       max-width: 100%;
     }
 
+    /* 折りたたみは印刷時に必ず展開する（下部のスクリプトでopenにする） */
+    .foldout > summary::before { content: none; }
+    .foldout { break-inside: avoid; page-break-inside: avoid; }
+
     /* セクションが途中で切れないようにする */
     .section {
       break-inside: avoid;
@@ -366,7 +404,7 @@
 
   <div class="notice">
     <strong>【使い方の基本】証券会社のシステムを使うときだけ接続してください。</strong><br>
-    使い終わったら Exit nodes を「None」に戻す習慣をつけてください。使っていないときに切っておくことで回線の混雑を防げます。
+    使い終わったら Exit nodes を「None」に戻す習慣をつけてください。使っていないときに切っておくことで、普段のインターネットの速度低下を防げます。
   </div>
 
   <!-- Section 1: インストール確認 -->
@@ -402,7 +440,7 @@
                 </svg>
                 <div style="flex:1;">
                   <div style="font-size:12px;font-weight:700;color:#888;">未接続</div>
-                  <div style="font-size:11px;color:#aaa;margin-top:2px;">全ドットがグレー</div>
+                  <div style="font-size:11px;color:#aaa;margin-top:2px;">全ドットがグレー<br>会社のMicrosoftアカウントでサインインができていない状態です</div>
                 </div>
                 <div style="font-size:11px;color:#e74c3c;font-weight:700;white-space:nowrap;">✗ 使用不可</div>
               </div>
@@ -426,7 +464,7 @@
                 </svg>
                 <div style="flex:1;">
                   <div style="font-size:12px;font-weight:700;color:#1a5276;">接続中（Connected）</div>
-                  <div style="font-size:11px;color:#5d8aa8;margin-top:2px;">黒いドットが「T」の形に並んでいる</div>
+                  <div style="font-size:11px;color:#5d8aa8;margin-top:2px;">黒いドットが「T」の形に並んでいる<br>アプリが起動しているだけの状態です</div>
                 </div>
                 <div style="font-size:11px;color:#2e86c1;font-weight:700;white-space:nowrap;">△ Exit node未選択</div>
               </div>
@@ -453,7 +491,7 @@
                 </svg>
                 <div style="flex:1;">
                   <div style="font-size:12px;font-weight:700;color:#148f77;">Exit node 接続中</div>
-                  <div style="font-size:11px;color:#1e8449;margin-top:2px;">「T」の形＋下段に右矢印が重なって表示</div>
+                  <div style="font-size:11px;color:#1e8449;margin-top:2px;">「T」の形＋下段に右矢印が重なって表示<br>会社のネットワークを使用してインターネットに接続している状態です</div>
                 </div>
                 <div style="font-size:11px;color:#148f77;font-weight:700;white-space:nowrap;">✓ 業務可能</div>
               </div>
@@ -485,26 +523,26 @@
         <div class="step-num">1</div>
         <div class="step-body">
           <div class="step-title">タスクトレイのアイコンを右クリック</div>
-          <div class="step-desc">Tailscaleのアイコンを右クリックするとメニューが表示されます。メニュー上部に「Connected」と表示されていれば接続済みです。STEP 3へ進んでください。</div>
-          <div class="step-img">
-            メニュー上部の表示で状態を確認<br>
-            「Tailscale  Connected」　→ 接続済み（STEP 3へ）<br>
-            「Tailscale  Not connected」→ 未接続（STEP 2へ）<br>
-            ログイン画面が表示される　→ ログインが必要（STEP 2-Bへ）
-          </div>
+          <div class="step-desc">Tailscaleのアイコンを右クリックするとメニューが表示されます。メニュー上部に「Connected」と表示されていれば接続済みです。そのままSTEP 2へ進んでください。</div>
+          <details class="foldout">
+            <summary>「Exit nodes」などいつもの表示が出ない場合</summary>
+            <div class="foldout-body">
+              <div class="step-img">
+                メニュー上部の表示で状態を確認<br>
+                「Tailscale  Connected」　→ 接続済み（STEP 2へ）<br>
+                「Tailscale  Not connected」→ 未接続（下記の手順へ）<br>
+                ログイン画面が表示される　→ ログインが必要（下記の手順へ）
+              </div>
+              <div class="foldout-sub">「Log in」でログインし直す</div>
+              <div class="step-desc">「Log in」をクリックするとブラウザが開きます。<strong>会社のMicrosoftアカウント</strong>でサインインしてください。ログイン完了後、メニューに「Connected」と表示されたら接続完了です。</div>
+              <div class="caution">⚠ 個人のMicrosoftアカウントやGoogleアカウントではログインできません。必ず会社から案内されたアカウントを使用してください。</div>
+              <div class="tip">💡 一度ログインすれば次回からは自動的に接続されます。毎回ログインする必要はありません。</div>
+            </div>
+          </details>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">未接続の場合 — 「Log in」でログインする</div>
-          <div class="step-desc">「Log in」をクリックするとブラウザが開きます。<strong>会社のMicrosoftアカウント</strong>でサインインしてください。ログイン完了後、メニューに「Connected」と表示されたら接続完了です。</div>
-          <div class="caution">⚠ 個人のMicrosoftアカウントやGoogleアカウントではログインできません。必ず会社から案内されたアカウントを使用してください。</div>
-          <div class="tip">💡 一度ログインすれば次回からは自動的に接続されます。毎回ログインする必要はありません。</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
         <div class="step-body">
           <div class="step-title">「Exit nodes」→ 所属支店名を選択する</div>
           <div class="step-desc">右クリックメニューから「Exit nodes」を選択すると選択肢が表示されます。「Recommended: 〇〇-hub」という表示が出ることがありますが、<strong>必ず自分の所属支店名（〇〇-hub）を選択してください。</strong>選択した支店名の左にチェックマーク（✓）が付けば設定完了です。</div>
@@ -518,15 +556,15 @@
             ※「Recommended」はシステムが自動で候補を出すものですが、<br>
             　かならず自分の所属支店名をご自身で選んでください。
           </div>
-          <div class="caution">⚠ 「Exit nodes」を選択しないと証券会社のシステムに接続できません。必ず所属支店を選択してから業務を開始してください。別の支店を選ぶと接続できない場合があります。</div>
+          <div class="tip">💡 稀に Exit nodes にどの支店も表示されないことがあります。その場合は Tailscale アプリを再起動してください。<br>タスクトレイのアイコンを右クリック → 一番上のアカウント名をクリック → 「Log out」 → もう一度「Log in」でログインし直します。</div>
         </div>
       </div>
       <div class="step">
-        <div class="step-num">4</div>
+        <div class="step-num">3</div>
         <div class="step-body">
           <div class="step-title">接続確認 — 業務システムにアクセスしてみる</div>
           <div class="step-desc">ブラウザで普段使っている証券会社のシステムにアクセスします。正常に表示されれば準備完了です。</div>
-          <div class="tip">💡 接続に5〜10秒かかることがあります。すぐにつながらなくても少し待ってから再試行してください。</div>
+          <div class="tip">💡 接続できない場合は、まず他のVPNアプリ（BIG-IP Edge Client、あかつきドリームモバイル、STARモバイル）やChromeリモートデスクトップが起動していないか確認してください。それでも接続できない場合はWindowsの更新ができていないなど他の原因が考えられますので、Windows Updateを実行して再起動してください。</div>
         </div>
       </div>
     </div>
@@ -589,7 +627,7 @@
         <div class="step-num">2</div>
         <div class="step-body">
           <div class="step-title">「Exit nodes」→「None」を選択する</div>
-          <div class="step-desc">証券会社のシステムを使い終わったら、すぐにExit nodesを「None」に戻してください。「Exit nodes」をクリックし、一覧の中から「None」を選択します。支店名のチェックが外れれば完了です。こまめに切る習慣をつけることで支店の回線混雑を防げます。</div>
+          <div class="step-desc">証券会社のシステムを使い終わったら、すぐにExit nodesを「None」に戻してください。「Exit nodes」をクリックし、一覧の中から「None」を選択します。支店名のチェックが外れれば完了です。こまめに切っておくと、普段のインターネットの速度低下を防げます。</div>
           <div class="tip">💡 PCをシャットダウンする場合はそのままシャットダウンしても問題ありません。次回起動時にExit nodesで支店を選び直してください。</div>
         </div>
       </div>
@@ -607,14 +645,14 @@
         <div class="rule-icon">🔴</div>
         <div class="rule-body">
           <div class="rule-title">証券会社のシステムを使うときだけ接続してください</div>
-          <div class="rule-desc">使い終わったら Exit nodes を「None」に戻してください。常時接続したままにすると支店の回線が混雑する原因になります。こまめに切る習慣をつけてください。</div>
+          <div class="rule-desc">使い終わったら Exit nodes を「None」に戻してください。現在のところ回線が混雑している様子はありませんので、あまり神経質になっていただく必要はありません。ただしExit nodeをオンにしている間は自宅のネットと会社のネットの両方を経由するため、通信速度が若干落ちます。必要のないときは外しておくことをおすすめします。</div>
         </div>
       </div>
       <div class="rule-row">
         <div class="rule-icon">🔴</div>
         <div class="rule-body">
-          <div class="rule-title">Exit nodeは必ず自分の所属支店を選択してください</div>
-          <div class="rule-desc">所属支店に接続する方が距離が近い分、速度が安定します。接続支店を変更したい場合はSlackで @事務員 にメンションしてご連絡ください。柔軟に対応します。</div>
+          <div class="rule-title">Exit nodeは原則として自分の所属支店を選択してください</div>
+          <div class="rule-desc">基本的には自分の所属支店のハブを選択してください。ただし所属支店のハブが表示されない・オフラインのときなど、緊急時は他支店のハブに接続していただいて構いません。所属支店を決めているのは、接続の集中を避けるための振り分けです。</div>
         </div>
       </div>
       <div class="rule-row">
@@ -635,7 +673,7 @@
         <div class="rule-icon">🟢</div>
         <div class="rule-body">
           <div class="rule-title">外出先でのご利用には注意してください</div>
-          <div class="rule-desc">画面を第三者に見られないよう背後への注意やプライバシーフィルターの使用など、基本的な対策は各自でお願いします。</div>
+          <div class="rule-desc">公共のWi-Fiのご使用はお控えください。テザリングや信頼できるWi-Fi環境でご使用ください。また、画面を第三者に見られないよう背後への注意やプライバシーフィルターの使用など、基本的な対策は各自でお願いします。</div>
         </div>
       </div>
       <div class="rule-row">
@@ -666,7 +704,7 @@
         </div>
         <div class="qref-item">
           <div class="qref-q">Q. Exit Nodeの選択肢に支店名が出ない</div>
-          <div class="qref-a">支店のハブPCが起動していない可能性があります。Slackで @事務員 にメンションしてご連絡ください。他支店のハブへの接続をご案内いたします。</div>
+          <div class="qref-a">支店のハブPCが起動していない可能性があります。お急ぎのときは他支店のハブを選択して業務を進めていただいて構いません。あわせてSlackで @事務員 にメンションしてご連絡ください。</div>
         </div>
         <div class="qref-item">
           <div class="qref-q">Q. PCを再起動したら切れた</div>
@@ -688,5 +726,18 @@
 
 
 </div>
+
+<script>
+  // 印刷時は折りたたみを自動で展開する
+  (function () {
+    var folds = function () { return document.querySelectorAll('details.foldout'); };
+    window.addEventListener('beforeprint', function () {
+      folds().forEach(function (d) { d.dataset.wasOpen = d.open ? '1' : '0'; d.open = true; });
+    });
+    window.addEventListener('afterprint', function () {
+      folds().forEach(function (d) { d.open = d.dataset.wasOpen === '1'; });
+    });
+  })();
+</script>
 </body>
 </html>
